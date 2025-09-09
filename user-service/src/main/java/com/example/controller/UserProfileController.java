@@ -4,6 +4,7 @@ import com.example.entity.User;
 import com.example.entity.UserProfile;
 import com.example.Repositories.UserProfileRepository;
 import com.example.service.UserService;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,6 +69,7 @@ public class UserProfileController {
     // ✅ Get Profile by Profile ID
     @GetMapping("/{profileId}")
     public ResponseEntity<UserProfile> getProfileById(@PathVariable Long profileId) {
+
         return userProfileRepository.findById(profileId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

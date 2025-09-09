@@ -52,8 +52,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
-                        .requestMatchers("/auth/login", "/api2/users/register").permitAll()
+                        .requestMatchers("/auth/login", "/auth/register").permitAll()
                         // Everything else requires JWT
+                        .requestMatchers("/api2/users/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

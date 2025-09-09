@@ -47,10 +47,6 @@ public class JwtUtil {
     /**
      * Extract username/email from token
      */
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
     /**
      * Extract expiration date from token
      */
@@ -77,10 +73,15 @@ public class JwtUtil {
     /**
      * Validate token with email
      */
-    public boolean validateToken(String token, String email) {
-        final String username = extractUsername(token);
-        return (username.equals(email) && !isTokenExpired(token));
+    public boolean validateToken(String token, String username) {
+        String extractedUsername = extractUsername(token);
+        return (username.equals(extractedUsername) && !isTokenExpired(token));
     }
+
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);  // Assuming the subject of the JWT is the username (email)
+    }
+
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());

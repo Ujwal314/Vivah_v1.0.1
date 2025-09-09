@@ -28,23 +28,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
         final String authHeader = request.getHeader("Authorization");
         String jwt = null;
         String username = null;
 
         // Check if Authorization header starts with "Bearer "
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
-            username = jwtUtil.extractUsername(jwt);
+            jwt = authHeader.substring(7);  // Extract the token
+            username = jwtUtil.extractUsername(jwt);  // Extract username from the token
         }
 
         // If username is valid and not already authenticated
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-            // Validate JWT token
-            if (jwtUtil.validateToken(jwt, String.valueOf(userDetails))) {
+            // Validate JWT token with the extracted username
+            if (jwtUtil.validateToken(jwt, username)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
@@ -61,4 +60,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Continue filter chain
         filterChain.doFilter(request, response);
     }
+
 }
