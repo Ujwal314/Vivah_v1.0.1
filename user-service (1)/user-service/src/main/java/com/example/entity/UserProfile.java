@@ -1,0 +1,43 @@
+package com.example.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "User_Profile")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserProfile {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long profileId;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true, nullable = false)
+    private User user;
+
+    private Integer age;
+    private Double height;
+    private Double weight;
+    private Double salaryPackage;
+    private String jobLocation;
+    private String education;
+    private String occupation;
+    private Boolean mangalik;
+    private Boolean disability;
+    private String disablityType;
+    private String bloodGroup;
+    private String gender;
+    private String maritalStatus;
+    private Integer rashiId;
+    private Integer nakshatraId;
+    private Integer gotraId;
+    private Integer paada;
+    private Integer casteId;
+    private Integer subcasteId;
+    private Integer religionId;
+}
