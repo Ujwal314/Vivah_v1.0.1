@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -31,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 true,  // account not expired
                 true,  // credentials not expired
                 true,  // account not locked
-                Collections.emptyList()
+                List.of(() -> "ROLE_USER")
         );
     }
 }

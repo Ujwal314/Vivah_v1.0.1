@@ -3,6 +3,7 @@ package com.example.vivaha_v100.controller;
 import com.example.vivaha_v100.dto.FilterCriteria;
 import com.example.vivaha_v100.dto.MatchDTO;
 import com.example.vivaha_v100.dto.ProfileDTO;
+import com.example.vivaha_v100.feign.UserProfileServiceClient;
 import com.example.vivaha_v100.service.FilterService;
 import com.example.vivaha_v100.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ public class Matchmaking {
     @Autowired
     private FilterService filterService;
 
+    @Autowired
+    private UserProfileServiceClient userProfileServiceClient;
+
     @GetMapping("/find")
     public List<Map.Entry<ProfileDTO, Integer>> find(@RequestParam int rashi_id,
                                                      @RequestParam int nakshatra_id,
@@ -25,7 +29,8 @@ public class Matchmaking {
         int[][] matchedRows = MatchService.getMatchedRows(matchDTO);
 
         Map<ProfileDTO, Integer> results = new HashMap<>();
-        List<ProfileDTO> allProfiles = ProfileGenerator.generateProfiles(100);
+        List<ProfileDTO> allProfiles = userProfileServiceClient.getAllProfilesExceptCurrentUser();
+        System.out.println(allProfiles);
 
         for (int[] row : matchedRows) {
             int rashiId = row[0];
