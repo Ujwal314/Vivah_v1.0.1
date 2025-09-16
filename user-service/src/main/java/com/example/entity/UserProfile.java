@@ -33,7 +33,7 @@ public class UserProfile {
     private Boolean disability;
     private String disablityType;
     private String bloodGroup;
-    private String gender;
+    private Boolean gender;
     private String maritalStatus;
     private Integer rashiId;
     private Integer nakshatraId;

@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login", "/auth/register").permitAll()
                         // Everything else requires JWT
                         .requestMatchers("/api2/users/**").authenticated()
+                        .requestMatchers("/api/user-profiles/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

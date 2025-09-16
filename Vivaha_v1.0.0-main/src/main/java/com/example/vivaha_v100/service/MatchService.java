@@ -18,7 +18,7 @@ public class MatchService {
     static {
         MATRIX1 = new int[38][38];
         try{
-            BufferedReader br = new BufferedReader(new FileReader("MATRIX1.csv"));
+            BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Administrator\\Downloads\\Vivah_v1.0.1\\Vivaha_v1.0.0-main\\src\\main\\java\\com\\example\\vivaha_v100\\service\\MATRIX1.csv"));
             String s1;
             String s2;
             int i = 0;
