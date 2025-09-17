@@ -1,8 +1,17 @@
 package com.example.controller;
 
+import com.example.Repositories.AddressRepository;
+import com.example.Repositories.FamilyDetailsRepository;
+import com.example.dto.AddressDTO;
+import com.example.dto.FamilyDetailsDTO;
+import com.example.dto.UserProfileDTO;
+import com.example.entity.Address;
+import com.example.entity.FamilyDetails;
 import com.example.entity.User;
 import com.example.entity.UserProfile;
 import com.example.Repositories.UserProfileRepository;
+import com.example.service.AddressService;
+import com.example.service.FamilyDetailsService;
 import com.example.service.UserService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user-profiles")
@@ -19,9 +29,17 @@ public class UserProfileController {
 
     @Autowired
     private UserProfileRepository userProfileRepository;
+    @Autowired
+    private AddressRepository addressRepository;
+    @Autowired
+    private FamilyDetailsRepository familyDetailsRepository;
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private AddressService addressService;
+    @Autowired
+    private FamilyDetailsService familyDetailsService;
 
     // ✅ Create or Update a User Profile
 //    @PostMapping("/{userId}")
@@ -191,9 +209,12 @@ public class UserProfileController {
 
         // Fetch all profiles
         List<UserProfile> allProfiles = userProfileRepository.findAll();
+        List<UserProfileDTO> allProfileDTOs = allProfiles.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
 
         // Filter out the current user's profile
-        List<UserProfile> filteredProfiles = allProfiles.stream()
+        List<UserProfileDTO> filteredProfiles = allProfileDTOs.stream()
                 .filter(profile -> currentProfile == null || !profile.getProfileId().equals(currentProfile.getProfileId()))
                 .toList();
 
@@ -218,5 +239,63 @@ public class UserProfileController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    private UserProfileDTO convertToDto(UserProfile userProfile) {
+        if (userProfile == null) {
+            return null;
+        }
+
+        // --- EFFICIENT & SAFE APPROACH ---
+
+        // 1. Fetch related entities ONLY ONCE and store them in Optionals.
+        Optional<FamilyDetails> familyDetailsOptional = familyDetailsRepository.findByUser_UserId(userProfile.getUser().getUserId());
+        Optional<Address> addressOptional = addressRepository.findByUser(userProfile.getUser());
+
+        // 2. Start building the DTO with the main profile details.
+        UserProfileDTO.UserProfileDTOBuilder dtoBuilder = UserProfileDTO.builder()
+                .profileId(userProfile.getProfileId())
+                .userId(userProfile.getUser().getUserId())
+                .fname(userProfile.getUser().getFname())
+                .lname(userProfile.getUser().getLname())
+                .age(userProfile.getAge())
+                .height(userProfile.getHeight())
+                .weight(userProfile.getWeight())
+                .salaryPackage(userProfile.getSalaryPackage())
+                .jobLocation(userProfile.getJobLocation())
+                .education(userProfile.getEducation())
+                .occupation(userProfile.getOccupation())
+                .mangalik(userProfile.getMangalik())
+                .disability(userProfile.getDisability())
+                .disablityType(userProfile.getDisablityType())
+                .bloodGroup(userProfile.getBloodGroup())
+                .gender(userProfile.getGender())
+                .maritalStatus(userProfile.getMaritalStatus())
+                .rashiId(userProfile.getRashiId())
+                .nakshatraId(userProfile.getNakshatraId())
+                .gotraId(userProfile.getGotraId())
+                .paada(userProfile.getPaada())
+                .casteId(userProfile.getCasteId())
+                .subcasteId(userProfile.getSubcasteId())
+                .religionId(userProfile.getReligionId());
+
+        // 3. Safely map Family Details if they exist.
+        familyDetailsOptional.ifPresent(details -> {
+            dtoBuilder.annualIncome(details.getAnnualIncome())
+                    .siblingsCount(details.getSiblingsCount())
+                    .fatherName(details.getFatherName())
+                    .motherName(details.getMotherName());
+        });
+
+        // 4. Safely map Address Details if they exist.
+        addressOptional.ifPresent(address -> {
+            dtoBuilder.city(address.getCity())
+                    .state(address.getState())
+                    .country(address.getCountry())
+                    .postalCode(address.getPostalCode());
+        });
+
+        // 5. Build and return the final DTO.
+        return dtoBuilder.build();
     }
 }

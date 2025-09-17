@@ -56,7 +56,7 @@ public class AddressService {
     }
 
     // Get by User
-    public List<Address> getAddressesByUser(User user) {
+    public Optional<Address> getAddressesByUser(User user) {
         return addressRepository.findByUser(user);
     }
 }

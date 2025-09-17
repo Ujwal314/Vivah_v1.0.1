@@ -42,4 +42,12 @@ public class UserProfile {
     private Integer casteId;
     private Integer subcasteId;
     private Integer religionId;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "addressId")
+    private Address address;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "family_id", referencedColumnName = "familyId")
+    private FamilyDetails familyDetails;
 }

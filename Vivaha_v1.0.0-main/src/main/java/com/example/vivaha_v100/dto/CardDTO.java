@@ -5,13 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class ProfileDTO {
-    private Integer profileId;
+@NoArgsConstructor
+public class CardDTO {
     private String fname;
     private String lname;
-    private Integer userId;
     private Integer age;
     private boolean gender;
     private String maritalStatus;
@@ -21,16 +19,16 @@ public class ProfileDTO {
     private String jobLocation;
     private String education;
     private String occupation;
-    private Boolean mangalik;
-    private Boolean disability;
+    private boolean mangalik;
+    private boolean disability;
     private String disabilityType;
     private String bloodGroup;
-    private Integer rashiId;
-    private Integer nakshatraId;
-    private Integer gotraId;
+    private String rashiName;
+    private String nakshatraName;
+    private String gotraName;
     private Integer paada;
-    private Integer casteId;
-    private Integer religionId;
+    private String casteName;
+    private String religionName;
     private String city;
     private String state;
     private String postalCode;

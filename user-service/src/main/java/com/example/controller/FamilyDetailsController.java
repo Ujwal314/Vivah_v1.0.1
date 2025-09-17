@@ -1,29 +1,42 @@
 package com.example.controller;
 
 import com.example.entity.FamilyDetails;
+import com.example.entity.User;
 import com.example.service.FamilyDetailsService;
+import com.example.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
-@RequestMapping("/family-details")
+@RequestMapping("/api/family-details")
 @RequiredArgsConstructor
 public class FamilyDetailsController {
 
-    private final FamilyDetailsService familyService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private FamilyDetailsService familyService;
 
     // Create
-    @PostMapping
-    public ResponseEntity<FamilyDetails> addFamilyDetails(@Valid @RequestBody FamilyDetails familyDetails) {
-        return ResponseEntity.ok(familyService.saveFamilyDetails(familyDetails));
+    @PostMapping("/me")
+    public ResponseEntity<Optional<FamilyDetails>> addFamilyDetails(@Valid @RequestBody FamilyDetails familyDetails) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.getUserByEmail(email).orElseThrow();
+        return ResponseEntity.ok(familyService.saveFamilyDetails(user.getUserId(),familyDetails));
     }
 
     // Get by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<FamilyDetails> getFamilyDetails(@PathVariable Long id) {
-        return familyService.getFamilyDetails(id)
+    @GetMapping("/me")
+    public ResponseEntity<FamilyDetails> getFamilyDetails() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.getUserByEmail(email).orElseThrow();
+        return familyService.getFamilyDetailsByUser(user.getUserId())
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -37,12 +50,11 @@ public class FamilyDetailsController {
     }
 
     // Update
-    @PutMapping("/{id}")
-    public ResponseEntity<FamilyDetails> updateFamilyDetails(
-            @PathVariable Long id,
-            @Valid @RequestBody FamilyDetails familyDetails) {
-
-        return familyService.updateFamilyDetails(id, familyDetails)
+    @PutMapping("/me")
+    public ResponseEntity<FamilyDetails> updateFamilyDetails(@Valid @RequestBody FamilyDetails familyDetails) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.getUserByEmail(email).orElseThrow();
+        return familyService.updateFamilyDetails(familyService.getFamilyDetailsByUser(user.getUserId()).get().getFamilyId(), familyDetails)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
