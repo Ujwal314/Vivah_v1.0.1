@@ -28,7 +28,7 @@ public class CasteController {
         this.casteService = casteService;
     }
 
-    /*
+
     @Operation(summary = "Create a new Caste", description = "Adds a new Caste to the database. The caste name must be unique.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Caste created successfully",
@@ -42,7 +42,7 @@ public class CasteController {
         Caste createdCaste = casteService.createCaste(caste);
         return ResponseEntity.created(URI.create("/api/castes/" + createdCaste.getCasteId())).body(createdCaste);
     }
-    */
+
 
     @Operation(summary = "Get all Castes", description = "Returns a complete list of all available Castes.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of castes",

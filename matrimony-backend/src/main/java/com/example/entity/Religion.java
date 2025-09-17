@@ -2,9 +2,9 @@ package com.example.entity;
 
 import jakarta.persistence.*;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+
+
+
 
 import lombok.*;
 import org.springframework.http.HttpStatus;
@@ -16,6 +16,8 @@ import java.util.Objects;
 @Setter
 @ToString
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "Religion")
 public class Religion {
 
@@ -39,11 +41,6 @@ public class Religion {
     @Override
     public int hashCode() {
         return getClass().hashCode();
-    }
-}
-
-    public HttpStatus getStatusCode() {
-        return HttpStatus.OK;
     }
 }
 

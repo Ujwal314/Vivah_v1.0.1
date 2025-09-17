@@ -18,11 +18,11 @@ public class CasteService {
         this.casteRepository = casteRepository;
     }
 
-    // Example of a write method
-    // @Transactional
-    // public Caste createCaste(Caste caste) {
-    //     return casteRepository.save(caste);
-    // }
+//     Example of a write method
+     @Transactional
+     public Caste createCaste(Caste caste) {
+         return casteRepository.save(caste);
+     }
 
     @Transactional(readOnly = true) // 2. Add Read-Only Transaction
     public List<Caste> getAllCastes() {

@@ -102,23 +102,5 @@ public class ReligionController {
             // If caste not found, return 404 Not Found
             return ResponseEntity.notFound().build();
         }
-
-    // ✅ Add a new religion
-    @PostMapping
-    public ResponseEntity<Religion> addReligion(@RequestBody Religion religion) {
-        if ("Muslim".equalsIgnoreCase(religion.getReligionName())) {
-            return ResponseEntity.badRequest().build();
-        }
-        Religion saved = religionService.addReligion(religion);
-        return ResponseEntity.ok(saved);
-    }
-
-
-    // ✅ Get all religions
-    @GetMapping
-    public ResponseEntity<List<Religion>> getAllReligions() {
-        List<Religion> religions = religionService.getAllReligions();
-        return ResponseEntity.ok(religions);
-
     }
 }
