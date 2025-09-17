@@ -1,18 +1,37 @@
 package com.example.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
+import java.util.Objects;
+
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "Religion")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Religion {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int religionId;
+    private Integer religionId; // Use wrapper 'Integer' instead of primitive 'int'
 
-    @Column(name="religion_name",nullable = false, unique = true, length = 50)
+    @Column(name="religion_name", nullable = false, unique = true, length = 50)
     private String religionName;
+
+    // A robust equals() and hashCode() is crucial for JPA entities
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Religion religion = (Religion) o;
+        return religionId != null && Objects.equals(religionId, religion.religionId);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

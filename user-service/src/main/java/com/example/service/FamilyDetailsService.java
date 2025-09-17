@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.Repositories.UserRepository;
 import com.example.entity.FamilyDetails;
 import com.example.Repositories.FamilyDetailsRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +13,14 @@ import java.util.Optional;
 public class FamilyDetailsService {
 
     private final FamilyDetailsRepository familyDetailsRepository;
+    private final UserRepository userRepository;
 
     // Create / Save
-    public FamilyDetails saveFamilyDetails(FamilyDetails details) {
-        return familyDetailsRepository.save(details);
-    }
+    public Optional<FamilyDetails> saveFamilyDetails(Long userId, FamilyDetails details) {
+        return userRepository.findById(userId).map(user -> {
+            details.setUser(user);
+            return familyDetailsRepository.save(details);
+        });    }
 
     // Get by ID
     public Optional<FamilyDetails> getFamilyDetails(Long id) {

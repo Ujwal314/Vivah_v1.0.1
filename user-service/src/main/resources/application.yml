@@ -29,4 +29,4 @@ app:
     expiration-ms: 86400000   # 1 day
 
 server:
-  port: 6003
+  port: 6002
