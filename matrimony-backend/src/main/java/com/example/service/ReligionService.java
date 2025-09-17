@@ -4,10 +4,15 @@ import com.example.entity.Religion;
 import com.example.repository.ReligionRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 public class ReligionService {

@@ -1,9 +1,14 @@
 package com.example.entity;
 
 import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import lombok.*;
+import org.springframework.http.HttpStatus;
+
 
 import java.util.Objects;
 
@@ -21,6 +26,7 @@ public class Religion {
     @Column(name="religion_name", nullable = false, unique = true, length = 50)
     private String religionName;
 
+
     // A robust equals() and hashCode() is crucial for JPA entities
     @Override
     public boolean equals(Object o) {
@@ -35,3 +41,9 @@ public class Religion {
         return getClass().hashCode();
     }
 }
+
+    public HttpStatus getStatusCode() {
+        return HttpStatus.OK;
+    }
+}
+

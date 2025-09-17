@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.entity.Rashi;
 import com.example.entity.Religion;
 import com.example.service.ReligionService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -28,6 +30,7 @@ public class ReligionController {
     public ReligionController(ReligionService religionService) {
         this.religionService = religionService;
     }
+
 
     @Operation(summary = "Create a new Religion", description = "Adds a new Religion to the database. The religion name must be unique.")
     @ApiResponses(value = {
@@ -99,5 +102,23 @@ public class ReligionController {
             // If caste not found, return 404 Not Found
             return ResponseEntity.notFound().build();
         }
+
+    // ✅ Add a new religion
+    @PostMapping
+    public ResponseEntity<Religion> addReligion(@RequestBody Religion religion) {
+        if ("Muslim".equalsIgnoreCase(religion.getReligionName())) {
+            return ResponseEntity.badRequest().build();
+        }
+        Religion saved = religionService.addReligion(religion);
+        return ResponseEntity.ok(saved);
+    }
+
+
+    // ✅ Get all religions
+    @GetMapping
+    public ResponseEntity<List<Religion>> getAllReligions() {
+        List<Religion> religions = religionService.getAllReligions();
+        return ResponseEntity.ok(religions);
+
     }
 }
