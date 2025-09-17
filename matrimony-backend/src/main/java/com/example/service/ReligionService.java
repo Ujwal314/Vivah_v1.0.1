@@ -2,8 +2,10 @@ package com.example.service;
 import com.example.entity.Religion;
 import com.example.repository.ReligionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+
 
 @Service
 public class ReligionService {
