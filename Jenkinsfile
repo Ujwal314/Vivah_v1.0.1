@@ -32,6 +32,14 @@ pipeline {
             }
         }
 
+        stage('Jar File Creation') {
+                    steps {
+                        echo "Running unit tests..."
+                        bat """cd C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\SixthJob\\matrimony-backend
+                                            mvn package"""
+                    }
+                }
+
 
 
     }
