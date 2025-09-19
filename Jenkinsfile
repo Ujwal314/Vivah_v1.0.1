@@ -18,7 +18,9 @@ pipeline {
         stage('Compile') {
             steps {
                 echo "Compiling the Spring Boot application..."
-                bat 'mvn clean compile'
+
+                bat """cd matrimony-backend
+                mvn clean compile"""
             }
         }
 
