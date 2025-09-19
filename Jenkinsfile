@@ -19,7 +19,7 @@ pipeline {
             steps {
                 echo "Compiling the Spring Boot application..."
 
-                bat """cd matrimony-backend
+                bat """cd C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\SixthJob
                 mvn clean compile"""
             }
         }
@@ -27,7 +27,8 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 echo "Running unit tests..."
-                bat 'mvn test'
+                bat """cd C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\SixthJob
+                                    mvn clean test"""
             }
         }
 
