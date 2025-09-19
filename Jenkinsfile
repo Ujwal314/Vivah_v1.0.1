@@ -1,5 +1,5 @@
 pipeline {
-    //agent= any agent
+    agent any
 
     environment {
         MAVEN_HOME = 'C:\\apache-maven-3.9.11' // Update if Maven is in a different path
