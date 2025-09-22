@@ -140,6 +140,9 @@
     </dependencyManagement>
 
     <build>
+             <finalName>
+                      matrimonial-backend
+             </finalName>
         <plugins>
             <!-- Compiler Plugin to set Java version to 17 -->
             <plugin>
