@@ -21,7 +21,7 @@
         <java.version>17</java.version> <!-- Set Java version to 17 -->
         <spring-cloud.version>2023.0.0</spring-cloud.version>
         <sonar.host.url>http://localhost:9000</sonar.host.url>
-        <sonar.login>squ_c34aecc6aea4d394a1c9f7bf81fadc594eaffd6d</sonar.login>
+        <sonar.login>squ_732292bd2d03d0ffb74d465a6a0489f372a09059</sonar.login>
         <sonar.java.binaries>target/classes</sonar.java.binaries>
     </properties>
 
@@ -124,6 +124,8 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+
     </dependencies>
 
     <dependencyManagement>
@@ -193,6 +195,17 @@
                 <artifactId>sonar-maven-plugin</artifactId>
                 <version>3.10.0.2594</version>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <failOnError>false</failOnError>
+                </configuration>
+            </plugin>
+
+
         </plugins>
     </build>
 </project>

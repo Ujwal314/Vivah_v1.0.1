@@ -40,6 +40,14 @@ pipeline {
                     }
                 }
 
+        stage('Sonar') {
+                            steps {
+                                echo "Running Sonar..."
+                                bat """cd ${WORKSPACE}\\matrimony-backend
+                                                    mvn sonar:sonar"""
+                            }
+                        }
+
 
 
     }
