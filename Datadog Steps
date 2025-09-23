@@ -1,0 +1,37 @@
+Datadog Agent Setup and Java Application Integration Guide
+
+Create a Datadog Account
+Visit the Datadog website
+ and sign up for an account.
+
+Install the Datadog Agent
+
+Navigate to Integrations > Agent within the Datadog dashboard.
+
+Select your operating system and copy the installation command provided, which includes your unique API key.
+
+Execute the command on your local machine to install the Datadog Agent.
+
+Once installed, the agent should be visible and reporting status on the Datadog dashboard.
+
+Integrate Your Java Service
+
+Download the Datadog Java tracer agent by running the following command in your terminal:
+
+wget -O dd-java-agent.jar 'https://dtdg.co/latest-java-tracer'
+
+
+This will download the dd-java-agent.jar file to your current directory.
+
+Start your Java application with the Datadog Java agent attached by executing:
+
+java -javaagent:"dd-java-agent.jar" -jar <application-jar-file>
+
+
+Replace <application-jar-file> with the path to your Java application's JAR file.
+
+Verify Service Visibility
+After starting your Java application with the agent, your service should appear in the Datadog dashboard under the list of monitored services.
+
+Explore Metrics and Monitoring
+You can now explore various metrics, create monitors, and configure dashboards to gain insights into your service's performance and health.
