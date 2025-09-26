@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -128,7 +129,6 @@ public class UserProfileController {
         profile.setGotraId(profileRequest.getGotraId());
         profile.setPaada(profileRequest.getPaada());
         profile.setCasteId(profileRequest.getCasteId());
-        profile.setSubcasteId(profileRequest.getSubcasteId());
         profile.setReligionId(profileRequest.getReligionId());
 
         // Save profile
@@ -174,7 +174,6 @@ public class UserProfileController {
         profile.setGotraId(profileRequest.getGotraId());
         profile.setPaada(profileRequest.getPaada());
         profile.setCasteId(profileRequest.getCasteId());
-        profile.setSubcasteId(profileRequest.getSubcasteId());
         profile.setReligionId(profileRequest.getReligionId());
 
         // Save profile
@@ -194,6 +193,16 @@ public class UserProfileController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+//    @GetMapping("/test")
+//    public ResponseEntity<?> test() {
+//        List<UserProfile> allProfiles = userProfileRepository.findAll();
+//        System.out.println(allProfiles);
+//        List<UserProfileDTO> allProfileDTOs = allProfiles.stream()
+//                .map(this::convertToDto)
+//                .collect(Collectors.toList());
+//        return ResponseEntity.ok(allProfileDTOs);
+//    }
+
     // ✅ Get all user profiles except the currently authenticated user's
     @GetMapping("/all")
     public ResponseEntity<?> getAllProfilesExceptCurrentUser() {
@@ -204,22 +213,40 @@ public class UserProfileController {
         User currentUser = userService.getUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Authenticated user not found."));
 
-        // Get the current user's profile (optional - may be null if not set)
         UserProfile currentProfile = currentUser.getUserProfile();
 
         // Fetch all profiles
         List<UserProfile> allProfiles = userProfileRepository.findAll();
-        List<UserProfileDTO> allProfileDTOs = allProfiles.stream()
-                .map(this::convertToDto)
+
+        // Extract userIds from all profiles
+        List<Long> userIds = allProfiles.stream()
+                .map(p -> p.getUser().getUserId())
                 .collect(Collectors.toList());
 
-        // Filter out the current user's profile
+        // Batch fetch familyDetails and addresses for all userIds
+        List<FamilyDetails> familyDetailsList = familyDetailsRepository.findAllByUser_UserIdIn(userIds);
+        List<Address> addressList = addressRepository.findAllByUser_UserIdIn(userIds);
+
+        // Convert lists to maps for fast lookup by userId
+        Map<Long, FamilyDetails> familyDetailsMap = familyDetailsList.stream()
+                .collect(Collectors.toMap(fd -> fd.getUser().getUserId(), fd -> fd));
+
+        Map<Long, Address> addressMap = addressList.stream()
+                .collect(Collectors.toMap(addr -> addr.getUser().getUserId(), addr -> addr));
+
+        // Convert profiles to DTOs using the batch loaded maps
+        List<UserProfileDTO> allProfileDTOs = allProfiles.stream()
+                .map(profile -> convertToDto(profile, familyDetailsMap, addressMap))
+                .collect(Collectors.toList());
+
+        // Filter out current user's profile
         List<UserProfileDTO> filteredProfiles = allProfileDTOs.stream()
                 .filter(profile -> currentProfile == null || !profile.getProfileId().equals(currentProfile.getProfileId()))
-                .toList();
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(filteredProfiles);
     }
+
 
     // ✅ Get Profile by User ID
     @GetMapping("/user/{userId}")
@@ -241,21 +268,18 @@ public class UserProfileController {
         }
     }
 
-    private UserProfileDTO convertToDto(UserProfile userProfile) {
-        if (userProfile == null) {
+    private UserProfileDTO convertToDto(UserProfile userProfile,
+                                        Map<Long, FamilyDetails> familyDetailsMap,
+                                        Map<Long, Address> addressMap) {
+        if (userProfile == null || userProfile.getUser() == null) {
             return null;
         }
 
-        // --- EFFICIENT & SAFE APPROACH ---
+        Long userId = userProfile.getUser().getUserId();
 
-        // 1. Fetch related entities ONLY ONCE and store them in Optionals.
-        Optional<FamilyDetails> familyDetailsOptional = familyDetailsRepository.findByUser_UserId(userProfile.getUser().getUserId());
-        Optional<Address> addressOptional = addressRepository.findByUser(userProfile.getUser());
-
-        // 2. Start building the DTO with the main profile details.
         UserProfileDTO.UserProfileDTOBuilder dtoBuilder = UserProfileDTO.builder()
                 .profileId(userProfile.getProfileId())
-                .userId(userProfile.getUser().getUserId())
+                .userId(userId)
                 .fname(userProfile.getUser().getFname())
                 .lname(userProfile.getUser().getLname())
                 .age(userProfile.getAge())
@@ -276,26 +300,25 @@ public class UserProfileController {
                 .gotraId(userProfile.getGotraId())
                 .paada(userProfile.getPaada())
                 .casteId(userProfile.getCasteId())
-                .subcasteId(userProfile.getSubcasteId())
                 .religionId(userProfile.getReligionId());
 
-        // 3. Safely map Family Details if they exist.
-        familyDetailsOptional.ifPresent(details -> {
-            dtoBuilder.annualIncome(details.getAnnualIncome())
-                    .siblingsCount(details.getSiblingsCount())
-                    .fatherName(details.getFatherName())
-                    .motherName(details.getMotherName());
-        });
+        FamilyDetails familyDetails = familyDetailsMap.get(userId);
+        if (familyDetails != null) {
+            dtoBuilder.annualIncome(familyDetails.getAnnualIncome())
+                    .siblingsCount(familyDetails.getSiblingsCount())
+                    .fatherName(familyDetails.getFatherName())
+                    .motherName(familyDetails.getMotherName());
+        }
 
-        // 4. Safely map Address Details if they exist.
-        addressOptional.ifPresent(address -> {
+        Address address = addressMap.get(userId);
+        if (address != null) {
             dtoBuilder.city(address.getCity())
                     .state(address.getState())
                     .country(address.getCountry())
                     .postalCode(address.getPostalCode());
-        });
+        }
 
-        // 5. Build and return the final DTO.
         return dtoBuilder.build();
     }
+
 }

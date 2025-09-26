@@ -40,7 +40,6 @@ public class UserProfile {
     private Integer gotraId;
     private Integer paada;
     private Integer casteId;
-    private Integer subcasteId;
     private Integer religionId;
 
     @OneToOne(cascade = CascadeType.ALL)

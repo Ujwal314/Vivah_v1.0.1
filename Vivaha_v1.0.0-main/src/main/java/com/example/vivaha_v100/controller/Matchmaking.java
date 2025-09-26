@@ -8,6 +8,7 @@ import com.example.vivaha_v100.dto.MatchDTO;
 import com.example.vivaha_v100.dto.ProfileDTO;
 import com.example.vivaha_v100.service.FilterService;
 import com.example.vivaha_v100.service.MatchService;
+import com.example.vivaha_v100.service.PdfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +37,59 @@ public class Matchmaking {
 
     @Autowired
     private LookupServiceClient lookupServiceClient; // Injected LookupServiceClient
+
+    @Autowired
+    private PdfService pdfService;
+
+    @GetMapping("/test")
+    public String test() {
+        List<ProfileDTO> allProfiles = userProfileServiceClient.getAllProfilesExceptCurrentUser();
+
+        return allProfiles.toString();
+    }
+
+    @GetMapping("/pdf")
+    public ResponseEntity<byte[]> generatePdf(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+                                              @ModelAttribute FilterCriteria criteria) throws IOException {
+        try {
+            String filePath = "matchmaking-results.pdf";
+
+            // Call your existing matchmaking method
+            ProfileDTO currentUserProfile = userProfileServiceClient.getProfileOfCurrentUser();
+
+            if (currentUserProfile == null ||
+                    currentUserProfile.getRashiId() == null ||
+                    currentUserProfile.getNakshatraId() == null){ // Include gender check
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Current user's profile is incomplete for matchmaking. Rashi, Nakshatra, and Gender are required."
+                );
+            }
+
+            int currentUserRashiId = currentUserProfile.getRashiId();
+            int currentUserNakshatraId = currentUserProfile.getNakshatraId();
+            boolean currentUserGender = currentUserProfile.isGender();
+            List<Map.Entry<CardDTO, Integer>> matchmakingResults = performMatchmaking(authorizationHeader, currentUserRashiId, currentUserNakshatraId, currentUserGender, criteria);
+
+            pdfService.createPdf(filePath, matchmakingResults);
+
+            File file = new File(filePath);
+            InputStream fileInputStream = new FileInputStream(file);
+            byte[] fileContent = fileInputStream.readAllBytes();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getName() + "\"");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(fileContent);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error while generating PDF".getBytes());
+        }
+    }
 
     @GetMapping("/find")
     public List<Map.Entry<CardDTO, Integer>> find( // Changed return type to CardDTO
