@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/match")
 public class Matchmaking {
@@ -138,7 +138,7 @@ public class Matchmaking {
         int[][] matchedRows = MatchService.getMatchedRows(matchDTO);
 
         List<ProfileDTO> allProfiles = userProfileServiceClient.getAllProfilesExceptCurrentUser();
-
+        System.out.println(allProfiles);
         Map<ProfileDTO, Integer> intermediateResults = new HashMap<>(); // Store ProfileDTO temporarily
 
         for (int[] row : matchedRows) {
@@ -154,10 +154,11 @@ public class Matchmaking {
                 }
             }
         }
+        System.out.println("inter:"+intermediateResults);
 
         List<Map.Entry<ProfileDTO, Integer>> sortedProfileResults = new ArrayList<>(intermediateResults.entrySet());
         sortedProfileResults.sort((a, b) -> b.getValue().compareTo(a.getValue()));
-
+        System.out.println("sorted:"+sortedProfileResults);
         // Apply filter criteria to ProfileDTOs first
         List<ProfileDTO> filteredProfiles = new ArrayList<>(sortedProfileResults.stream().map(Map.Entry::getKey).toList());
 

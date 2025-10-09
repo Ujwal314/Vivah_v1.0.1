@@ -16,6 +16,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/addresses")
 @RequiredArgsConstructor
+
 public class AddressController {
 
     private final AddressService addressService;

@@ -1,16 +1,18 @@
 package com.example.controller;
 import com.example.entity.User;
+import com.example.entity.UserProfile;
 import com.example.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+
 public class UserController {
 
     private final UserService userService;
@@ -46,7 +48,12 @@ public class UserController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
+    @GetMapping("/me")
+    public ResponseEntity<User> getUserOfCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.getUserByEmail(email).orElseThrow();
+        return ResponseEntity.ok(user.getUserProfile().getUser());
+    }
     // ✅ Update user
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(
